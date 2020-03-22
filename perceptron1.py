@@ -9,7 +9,7 @@ from matplotlib import cm
 
 
 def Cross_Entropy(y_hat, y):
-    # 2 lehetseges esett: either 0 or 1
+    # 2 lehetseges esett:  0 or 1
     # np.log() termeszetes logaritmust jelent
     if y == 1:
       return -np.log(y_hat)
@@ -67,7 +67,6 @@ eta = 0.01
 E = []
 # Az aktualis trainig elkezdodik annyiszor amennyi az Epoch
 for ep in range(Epoch):
-    #Megkeveri a train_data x es az o Y labeleit 
     random_index = np.arange(X.shape[0])
     # random_index ugyanakkora hosszusaggal rendelkezik mint az X es Y, es egy megkevert X index listat tartalmaz. 
     np.random.shuffle(random_index)
@@ -75,18 +74,18 @@ for ep in range(Epoch):
     # Minden uj ciklusban uresse tesszuk.
     e = []
     # Ez a lista vegig megy a megkevert training datan. a random index biztositja, hogy 
-    # az X-ben a legjobb erteket vesszuk ki az Y-bol
+    # az X-ben a legjobb erteket vesszuk ki
     for i in random_index:
         # kiveszi az i-dik erteket X-bol
         x = X[i]
         # Kiszamolja Z, ami a szigmoid mertekeunk lesz
         Z = W_1* x[0] + W_2* x[1] + W_0
-        # alkalmazzuk a szigmoid fouugvenyre, hogy generaljon egy kimenetet a perceptronnak
+        # alkalmazzuk a szigmoid fugvenyre, hogy generaljon egy kimenetet a perceptronnak
         Y_hat = sigmoid(Z)
-        # kiszamolja binary cross-entropy errorokat az i-dik adatra es hozzaadja a e[]-hez
+        # kiszamolja binary cross-entropy errorokat az i-dik elemre es hozzaadja a e[]-hez
         e.append(Cross_Entropy(Y_hat, Y[i]))
         
-        # Kiszamolja a mi hiba fuggvenyunk gradienseit, 3 tanulhato ertek (a neuralis halo sulyai)
+        # Kiszamolja a hiba fuggvenyunk gradienseit, 3 tanulhato ertek (a neuralis halo sulyai)
         dEdW_1 = derivative_Cross_Entropy(Y_hat, Y[i])*derivative_sigmoid(Y_hat)*x[0]
         dEdW_2 = derivative_Cross_Entropy(Y_hat, Y[i]) * derivative_sigmoid(Y_hat) * x[1]
         dEdW_0 = derivative_Cross_Entropy(Y_hat, Y[i])*derivative_sigmoid(Y_hat)
@@ -111,11 +110,9 @@ for ep in range(Epoch):
 
         plt.title('Decision Boundary Created by the Hyper-plane')
         # Az egyenlosegben Z = W2X2 + W1X1 + W0 es tudjuk hogy a linearis dontes hatar meghatarzohato hogyha Z = 0,
-        # es atrendezve x_2 = (-W1/W2) * x1 - (W0/W2) amely egy egyenes (-W1/W2) es a elfogo - (W0/W2). 
+        # es atrendezve x_2 = (-W1/W2) * x1 - (W0/W2). 
         # Tudva hogy a perceptron mar tudja a sulyokat, x1-nek valasztunk egy terjedelmet (range), 
-        # es mindegyikre kiszamoljuk x2. Miert egy sorozat? mert mi ki akarunk rajzolni egy folytonos vonalat, 
-        # es az x-ink csak egy diszkret ertekek.
-        # Ami lehet 0 vagy 5
+        # es mindegyikre kiszamoljuk x2-t.  Ezzel kirajzolunk egy folytonos vonalat
         x_1 = np.arange(-2, 5, 0.1)
         W_1 * x[0] + W_2 * x[1] + W_0
         x_2 = (-W_1/W_2) * x_1 - (W_0/W_2)
@@ -123,15 +120,15 @@ for ep in range(Epoch):
         plt.plot(x_2, x_1, '-k', marker='_', label="DB")
         plt.xlabel('x1', fontsize=20)
         plt.ylabel('x2', fontsize=20)
-        # Hozzaadjuk a masodik alfigurat. Ez mutatja az X hiper-tervet es az utat amelyet keresztul vag a bemeneti kozt
+        # Hozzaadjuk a masodik alfigurat. Ez mutatja az utat amely keresztul vag a bemeneti kozon
         ax = fig.add_subplot(132, projection='3d')
         x_0 = np.arange(-10, 10, 0.1)
-        # szuksegunk van a meshgridre hogy haromdimenziosan is tudjunk rajzolni
+        # szuksegunk van a meshgridre hogy harom dimenziosan is tudjunk rajzolni
         X_0, X_1 = np.meshgrid(x_0, x_1)
         # Minden x_0 es X_1 kombinaciojara kiszamoljuk a Z-t harom dimenzioban
         Z = X_0*W_1 + X_1*W_2 + W_0
-        # Felhasznaljuk a wireframe eszkozt, hogy lathassuk a hyper plane mogott. lepeseket, 
-        # meghatarozzuk a grid meretet. A kisebb ertekeit
+        # Felhasznaljuk a wireframe libraryt, hogy lathassuk a hyper plane mogott a lepeseket
+        # meghatarozzuk a grid meretet.
         ax.plot_wireframe(X_0, X_1, Z, rstride=10, cstride=10)
         # Vizualizalni szeretnenk a linearis dontes hatarokat felhasznalva az elobbi al figurat
         ax.scatter(x_2, x_1, 0, marker='_', c='k')
@@ -149,7 +146,7 @@ for ep in range(Epoch):
         # A cm konyvtar kiszinezi a sigmoid altal kigeneralt alfigurat, a sigmoid ertekei alapjan
         # Vilagosabb szinek kozelebb vannak az egyhez es a sotetek a 0-hoz! 
         # Igy latni fogjuk hogy a szigmoid(Z), ami a vegso kimenet a perceptronnak (y_hat)
-        # megkozelitloeg egyenlok lesznek 1-el a pozitiv peldaink es az ertekek megkozlitoleg egyenlok lesznek a 0-val.
+        # megkozelitloeg egyenlok lesznek 1-el es az tobbi megkozlitoleg egyenlok lesznek a 0-val.
         my_col = cm.jet(sigmoid(Z) / np.amax(sigmoid(Z)))
         ax.plot_surface(X_0, X_1, sigmoid(Z), facecolors=my_col)
         # Ujra akarjuk latni a linearis dontes hatarokat melyek letrejottek az elso alfiguraban a jelenlegi training peldaban
@@ -163,5 +160,5 @@ for ep in range(Epoch):
         plt.ylabel('x2', fontsize=20)
         plt.grid()
         plt.show()
-    # Most e tartalmazza az osszes hibat a training alatt minden epoch-on kivul. Atlagoljuk es hozzadjuk a E[]-hez
+    # Most e tartalmazza az osszes hibat a training alatt. Atlagoljuk es hozzadjuk a E[]-hez
     E.append(np.mean(e))
